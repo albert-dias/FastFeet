@@ -3,6 +3,7 @@ import Delivery from '../models/Delivery';
 import Deliveryman from '../models/Deliveryman';
 import Recipient from '../models/Recipient';
 import File from '../models/File';
+import Mail from '../../lib/Mail';
 
 class DeliveryController {
   async index(req, res) {
@@ -78,6 +79,13 @@ class DeliveryController {
     }
 
     const { id, product } = await Delivery.create(req.body);
+
+    await Mail.sendMail({
+      to: `${deliveryman.name} <${deliveryman.email}>`,
+      subject: 'Testando envio de email',
+      text: 'Vai um teste ai gente',
+    });
+
     return res.json({ id, product, recipient_id, deliveryman_id });
   }
 
@@ -86,17 +94,23 @@ class DeliveryController {
       product: Yup.string().required(),
       deliveryman_id: Yup.number().required(),
       recipient_id: Yup.number().required(),
+      start_date: Yup.date(),
+      end_date: Yup.date(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { product, deliveryman_id, recipient_id } = req.body;
+    const {
+      product,
+      deliveryman_id,
+      recipient_id,
+      start_date,
+      end_date,
+    } = req.body;
 
-    const { deliveryId } = req.params;
-
-    const delivery = await Delivery.findByPk(deliveryId);
+    const delivery = await Delivery.findByPk(req.params.deliveryId);
 
     if (!delivery) {
       return res.status(400).json({ error: 'Delivery is not registered' });
@@ -116,7 +130,14 @@ class DeliveryController {
 
     const { id } = await delivery.update(req.body);
 
-    return res.json({ id, product, recipient_id, deliveryman_id });
+    return res.json({
+      id,
+      product,
+      recipient_id,
+      deliveryman_id,
+      start_date,
+      end_date,
+    });
   }
 
   async delete(req, res) {
