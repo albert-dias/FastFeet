@@ -9,6 +9,8 @@ import DeliverymanController from './app/controllers/DeliverymanController';
 import DeliveryController from './app/controllers/DeliveryController';
 import DeliveriesController from './app/controllers/DeliveriesController';
 import EnterOpenController from './app/controllers/EnterOpenController';
+import WithdrawPackageController from './app/controllers/WithdrawPackageController';
+import FinalizePackageController from './app/controllers/FinalizePackageController';
 
 import authMiddleware from './app/middlewares/auth';
 
@@ -22,6 +24,15 @@ routes.get(
 );
 
 routes.get('/deliveryman/:deliverymanId/open', EnterOpenController.index);
+routes.put(
+  '/deliveryman/:deliverymanId/:deliveryId/withdraw',
+  WithdrawPackageController.update
+);
+routes.put(
+  '/deliveryman/:deliverymanId/:deliveryId/finish',
+  upload.single('file'),
+  FinalizePackageController.update
+);
 
 routes.post('/sessions', SessionController.store);
 
