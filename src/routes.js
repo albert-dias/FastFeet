@@ -11,6 +11,8 @@ import DeliveriesController from './app/controllers/DeliveriesController';
 import EnterOpenController from './app/controllers/EnterOpenController';
 import WithdrawPackageController from './app/controllers/WithdrawPackageController';
 import FinalizePackageController from './app/controllers/FinalizePackageController';
+import DeliveryProblemController from './app/controllers/DeliveryProblemController';
+import CanceledDeliveryController from './app/controllers/CanceledDeliveryController';
 
 import authMiddleware from './app/middlewares/auth';
 
@@ -36,7 +38,16 @@ routes.put(
 
 routes.post('/sessions', SessionController.store);
 
-routes.use(authMiddleware);
+routes.post('/delivery/:deliveryId/problems', DeliveryProblemController.store);
+
+routes.use(authMiddleware); // Validação da Session
+
+routes.get('/delivery/:deliveryId/problems', CanceledDeliveryController.index);
+routes.get('/deliveries/problems', DeliveryProblemController.index);
+routes.delete(
+  '/problem/:deliveryId/cancel-delivery',
+  CanceledDeliveryController.delete
+);
 
 routes.post('/files', upload.single('file'), FileController.store);
 
@@ -52,5 +63,8 @@ routes.delete('/deliveries/:deliveryId', DeliveryController.delete);
 
 routes.post('/recipient', RecipientController.store);
 routes.put('/recipient', RecipientController.update);
+
+// routes.get();
+// routes.delete();
 
 export default routes;
